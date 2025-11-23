@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunidades - CineEstante</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .film-grain { background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E"); }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 min-h-screen film-grain text-white">
+
+    <nav class="bg-black bg-opacity-50 backdrop-blur-md border-b border-purple-500/20 p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/" class="flex items-center gap-2 text-xl font-bold">
+                <i class="fas fa-film text-purple-400"></i> CineEstante
+            </a>
+            <a href="/" class="text-gray-300 hover:text-white"><i class="fas fa-home mr-1"></i> Voltar</a>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Comunidades</h1>
+            <p class="text-xl text-gray-300">Encontre sua tribo. Debata seus filmes favoritos.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for comunidade in comunidades %}
+            <a href="{% url 'filmes:detalhe_comunidade' comunidade.slug %}" class="group relative h-64 rounded-2xl overflow-hidden border border-purple-500/20 shadow-2xl transition transform hover:-translate-y-2">
+                {% if comunidade.imagem_capa %}
+                    <img src="{{ comunidade.imagem_capa }}" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 transition">
+                {% else %}
+                    <div class="absolute inset-0 bg-gray-800"></div>
+                {% endif %}
+                
+                <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
+
+                <div class="absolute bottom-0 left-0 p-6 w-full">
+                    <h3 class="text-3xl font-bold text-white mb-1">{{ comunidade.nome }}</h3>
+                    <p class="text-gray-300 text-sm line-clamp-2 mb-3">{{ comunidade.descricao }}</p>
+                    <span class="inline-block bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                        Entrar <i class="fas fa-arrow-right ml-1"></i>
+                    </span>
+                </div>
+            </a>
+            {% empty %}
+            <div class="col-span-3 text-center py-10 border border-dashed border-gray-600 rounded-xl">
+                <p class="text-gray-400">Nenhuma comunidade criada ainda. Vá ao /admin para criar uma!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

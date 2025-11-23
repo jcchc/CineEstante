@@ -14,7 +14,6 @@
 </head>
 <body class="bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 min-h-screen">
     
-    <!-- Navbar -->
     <nav class="bg-black bg-opacity-50 backdrop-blur-md border-b border-purple-500/20 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -32,7 +31,21 @@
                     <a href="/filmes/buscar/" class="text-gray-300 hover:text-white transition">
                         <i class="fas fa-search"></i> <span class="hidden sm:inline ml-1">Buscar</span>
                     </a>
+                    <a href="{% url 'filmes:lista_comunidades' %}" class="text-gray-300 hover:text-white transition">
+                        <i class="fas fa-users"></i> <span class="hidden sm:inline ml-1">Comunidades</span>
+                    </a>
+
                     {% if user.is_authenticated %}
+                    <a href="{% url 'filmes:ver_notificacoes' %}" class="relative text-gray-300 hover:text-white transition mr-4">
+                        <i class="fas fa-bell text-xl"></i>
+                        {% if user.notificacoes_recebidas.exists %}
+                            {% with qtd=user.notificacoes_recebidas.filter.count %}
+                            <span class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full border-2 border-black">
+                                !
+                            </span>
+                            {% endwith %}
+                        {% endif %}
+                    </a>
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" class="flex items-center gap-2 text-white">
                             <img src="{{ request.user.perfil.get_foto_url }}" 
@@ -65,7 +78,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section com Backdrop -->
     <div class="relative h-96 overflow-hidden">
         <img src="{{ filme.backdrop }}" 
              alt="{{ filme.titulo }}"
@@ -74,20 +86,16 @@
         <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent"></div>
     </div>
 
-    <!-- Conteúdo Principal -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 relative z-10">
         
-        <!-- Info do Filme -->
         <div class="flex flex-col md:flex-row gap-8 mb-12">
             
-            <!-- Poster -->
             <div class="flex-shrink-0">
                 <img src="{{ filme.poster }}" 
                      alt="{{ filme.titulo }}"
                      class="w-64 rounded-xl shadow-2xl border-4 border-purple-500/30">
             </div>
             
-            <!-- Informações -->
             <div class="flex-1">
                 <h1 class="text-5xl font-black text-white mb-4">{{ filme.titulo }}</h1>
                 
@@ -125,8 +133,7 @@
                 </p>
                 {% endif %}
                 
-                <!-- Botões de Ação -->
-                <div class="flex gap-4">
+                <div class="flex gap-4 flex-wrap">
                     {% if na_estante %}
                     <form method="POST" action="{% url 'filmes:remover_filme_estante' filme.id %}" class="inline">
                         {% csrf_token %}
@@ -143,6 +150,11 @@
                     </form>
                     {% endif %}
                     
+                    <button onclick="document.getElementById('modalSugestao').classList.remove('hidden')" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-lg transition flex items-center gap-2">
+                        <i class="fas fa-paper-plane"></i> Indicar
+                    </button>
+                    
                     <a href="/" class="bg-gray-700 hover:bg-gray-600 text-white font-bold px-8 py-3 rounded-lg transition flex items-center gap-2">
                         <i class="fas fa-arrow-left"></i> Voltar
                     </a>
@@ -150,7 +162,6 @@
             </div>
         </div>
 
-        <!-- Sinopse -->
         {% if filme.sinopse %}
         <div class="bg-gray-800 bg-opacity-50 rounded-xl p-8 mb-12 border border-purple-500/20">
             <h2 class="text-3xl font-bold text-white mb-4 flex items-center gap-3">
@@ -161,14 +172,12 @@
         </div>
         {% endif %}
 
-        <!-- Seção de Comentários -->
         <div class="bg-gray-800 bg-opacity-50 rounded-xl p-8 border border-purple-500/20">
             <h2 class="text-3xl font-bold text-white mb-6 flex items-center gap-3">
                 <i class="fas fa-comments text-purple-400"></i>
                 Comentários ({{ total_comentarios }})
             </h2>
             
-            <!-- Formulário para Adicionar Comentário -->
             <form method="POST" action="{% url 'filmes:adicionar_comentario' filme.id %}" class="mb-8">
                 {% csrf_token %}
                 <div class="flex gap-4">
@@ -180,7 +189,19 @@
                                   placeholder="Escreva seu comentário sobre o filme..."
                                   class="w-full bg-gray-700 text-white rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
                                   required></textarea>
-                        <div class="flex justify-end mt-2">
+                        
+                        <div class="flex justify-between items-center mt-3">
+                            <label class="flex items-center gap-2 cursor-pointer group">
+                                <div class="relative">
+                                    <input type="checkbox" name="spoiler" class="peer sr-only">
+                                    <div class="w-5 h-5 border-2 border-gray-500 rounded peer-checked:bg-red-600 peer-checked:border-red-600 transition"></div>
+                                    <i class="fas fa-check text-white text-xs absolute top-1 left-1 opacity-0 peer-checked:opacity-100 pointer-events-none"></i>
+                                </div>
+                                <span class="text-gray-400 text-sm group-hover:text-white transition select-none">
+                                    <i class="fas fa-eye-slash mr-1"></i> Contém Spoiler?
+                                </span>
+                            </label>
+
                             <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-2 rounded-lg transition">
                                 <i class="fas fa-paper-plane mr-2"></i> Comentar
                             </button>
@@ -189,7 +210,6 @@
                 </div>
             </form>
             
-            <!-- Lista de Comentários -->
             <div class="space-y-6">
                 {% for comentario in comentarios %}
                 <div class="bg-gray-700 bg-opacity-50 rounded-lg p-6 border border-gray-600" id="comentario-{{ comentario.id }}">
@@ -212,9 +232,26 @@
                                 </form>
                                 {% endif %}
                             </div>
-                            <p class="text-gray-300 mb-4">{{ comentario.texto }}</p>
+
+                            {% if comentario.spoiler %}
+                                <div x-data="{ revealed: false }" class="relative mb-4">
+                                    <p class="text-gray-300 transition-all duration-500"
+                                       :class="revealed ? '' : 'blur-md select-none opacity-50'">
+                                        {{ comentario.texto }}
+                                    </p>
+
+                                    <div x-show="!revealed" 
+                                         class="absolute inset-0 flex items-center justify-center z-10">
+                                        <button @click="revealed = true" 
+                                                class="bg-red-600/90 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg backdrop-blur-sm transition transform hover:scale-105 flex items-center gap-2">
+                                            <i class="fas fa-eye-slash"></i> Alerta de Spoiler! Ver?
+                                        </button>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p class="text-gray-300 mb-4">{{ comentario.texto }}</p>
+                            {% endif %}
                             
-                            <!-- Botão de Curtir -->
                             <form method="POST" action="{% url 'filmes:curtir_comentario' comentario.id %}" class="inline">
                                 {% csrf_token %}
                                 <button type="submit" class="flex items-center gap-2 text-gray-400 hover:text-red-400 transition">
@@ -236,7 +273,36 @@
 
     </div>
 
-    <!-- Footer -->
+    <!-- Modal de Sugestão -->
+    <div id="modalSugestao" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-gray-800 p-8 rounded-xl max-w-md w-full border border-purple-500/30 shadow-2xl relative">
+            <button onclick="document.getElementById('modalSugestao').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
+            <h3 class="text-2xl font-bold text-white mb-6">Indicar para um amigo</h3>
+            
+            <form method="POST" action="{% url 'filmes:enviar_sugestao' filme.id %}">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="block text-gray-400 mb-2">Nome do Usuário (Username)</label>
+                    <input type="text" name="username" required 
+                           class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-white focus:border-purple-500 outline-none"
+                           placeholder="Ex: joaosilva">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-400 mb-2">Mensagem (Opcional)</label>
+                    <textarea name="mensagem" rows="3" 
+                              class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-white focus:border-purple-500 outline-none"
+                              placeholder="Assiste esse filme, é muito bom!"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition">
+                    Enviar Recomendação 🚀
+                </button>
+            </form>
+        </div>
+    </div>
+
     <footer class="bg-black bg-opacity-50 border-t border-purple-500/20 mt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="text-center text-gray-400">

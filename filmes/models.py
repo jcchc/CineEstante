@@ -30,6 +30,7 @@ class Filme(models.Model):
     # Imagens (URLs)
     poster = models.URLField(max_length=500)
     backdrop = models.URLField(max_length=500, blank=True)
+    trailer = models.URLField(max_length=500, blank=True, null=True)
     
     # Metadados
     data_criacao = models.DateTimeField(auto_now_add=True)
@@ -91,6 +92,7 @@ class Comentario(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comentarios')
     
     texto = models.TextField()
+    spoiler = models.BooleanField(default=False, verbose_name="Contém Spoiler")
     
     # Metadados
     data_criacao = models.DateTimeField(auto_now_add=True)
@@ -138,3 +140,65 @@ class Reacao(models.Model):
     
     def __str__(self):
         return f"{self.usuario.username} {self.tipo} no comentário de {self.comentario.usuario.username}"
+    
+    # =====================================================
+# MODEL: COMUNIDADE E FÓRUM (Funcionalidade 9)
+# =====================================================
+
+class Comunidade(models.Model):
+    """O Nicho ou Gênero (Ex: Terror, Sci-Fi, Anos 80)"""
+    nome = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True, help_text="Identificador na URL (ex: terror)")
+    descricao = models.TextField(blank=True)
+    imagem_capa = models.URLField(max_length=500, blank=True, help_text="URL da imagem de capa da comunidade")
+
+    class Meta:
+        verbose_name = "Comunidade"
+        verbose_name_plural = "Comunidades"
+
+    def __str__(self):
+        return self.nome
+
+class Topico(models.Model):
+    """Uma discussão criada por um usuário dentro de uma comunidade"""
+    comunidade = models.ForeignKey(Comunidade, on_delete=models.CASCADE, related_name='topicos')
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='topicos_criados')
+    
+    titulo = models.CharField(max_length=200)
+    conteudo = models.TextField(help_text="O texto da discussão")
+    
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-data_criacao'] # Mais recentes primeiro
+        verbose_name = "Tópico"
+        verbose_name_plural = "Tópicos"
+
+    def __str__(self):
+        return self.titulo
+
+class RespostaTopico(models.Model):
+    """Respostas dentro de um tópico"""
+    topico = models.ForeignKey(Topico, on_delete=models.CASCADE, related_name='respostas')
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='respostas_topico')
+    texto = models.TextField()
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['data_criacao'] # Antigos primeiro (ordem de conversa)
+
+    def __str__(self):
+        return f"Resposta de {self.usuario.username} em {self.topico}"
+
+        # No final de filmes/models.py
+
+class Notificacao(models.Model):
+    remetente = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificacoes_enviadas')
+    destinatario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificacoes_recebidas')
+    filme = models.ForeignKey(Filme, on_delete=models.CASCADE)
+    mensagem = models.CharField(max_length=255, blank=True, null=True)
+    lida = models.BooleanField(default=False)
+    data_envio = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"De {self.remetente} para {self.destinatario}: {self.filme.titulo}"

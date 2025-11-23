@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Criar Tópico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>.film-grain { background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E"); }</style>
+</head>
+<body class="bg-gray-900 min-h-screen film-grain flex items-center justify-center p-4">
+    <div class="max-w-2xl w-full bg-gray-800 p-8 rounded-2xl border border-purple-500/20 shadow-2xl">
+        <h2 class="text-2xl font-bold text-white mb-6">Novo Tópico em <span class="text-purple-400">{{ comunidade.nome }}</span></h2>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-gray-400 text-sm mb-2">Título do Tópico</label>
+                <input type="text" name="titulo" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none" placeholder="Ex: Qual o melhor filme de 2024?" required>
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-400 text-sm mb-2">Conteúdo</label>
+                <textarea name="conteudo" rows="5" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none" placeholder="Descreva sua discussão..." required></textarea>
+            </div>
+            <div class="flex gap-4">
+                <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-bold transition">Publicar</button>
+                <a href="{% url 'filmes:detalhe_comunidade' comunidade.slug %}" class="...">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

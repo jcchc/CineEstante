@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ comunidade.nome }} - CineEstante</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>.film-grain { background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E"); }</style>
+</head>
+<body class="bg-gray-900 min-h-screen film-grain text-white">
+
+    <div class="max-w-5xl mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <a href="{% url 'filmes:lista_comunidades' %}" class="text-gray-400 hover:text-purple-400 text-sm mb-2 block"><i class="fas fa-arrow-left"></i> Voltar para Comunidades</a>
+                <h1 class="text-4xl font-bold">{{ comunidade.nome }}</h1>
+                <p class="text-gray-400">{{ comunidade.descricao }}</p>
+            </div>
+            <a href="{% url 'filmes:criar_topico' comunidade.slug %}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-bold transition shadow-lg shadow-purple-500/30">
+                <i class="fas fa-plus mr-2"></i> Novo Tópico
+            </a>
+        </div>
+
+        <div class="bg-gray-800 bg-opacity-50 border border-purple-500/20 rounded-xl overflow-hidden">
+            {% for topico in topicos %}
+            <div class="p-6 border-b border-gray-700 hover:bg-gray-700/50 transition">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <a href="{% url 'filmes:detalhe_topico' topico.id %}" class="text-xl font-bold text-white hover:text-purple-400 transition block mb-1">
+                            {{ topico.titulo }}
+                        </a>
+                        <div class="text-sm text-gray-400 flex items-center gap-2">
+                            <i class="fas fa-user-circle"></i> {{ topico.usuario.username }}
+                            <span class="text-gray-600">•</span>
+                            <span>{{ topico.data_criacao|date:"d/m/Y" }}</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end">
+                        <span class="bg-gray-700 text-gray-300 px-3 py-1 rounded-full text-xs font-bold">
+                            <i class="fas fa-comment mr-1"></i> {{ topico.respostas.count }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="p-12 text-center text-gray-500">
+                <i class="fas fa-wind text-4xl mb-4"></i>
+                <p>Nenhum tópico criado ainda. Seja o primeiro!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

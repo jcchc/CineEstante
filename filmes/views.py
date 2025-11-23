@@ -1,11 +1,14 @@
 # filmes/views.py
+from django.contrib.auth.models import User
 import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib import messages
-from .models import Filme, Estante, Comentario, Reacao
+from .models import Filme, Estante, Comentario, Reacao, Comunidade, Topico, RespostaTopico, Notificacao
+from .forms import TopicoForm, RespostaTopicoForm
+
 
 # =====================================================
 # VIEWS ANTIGAS (Mantidas)
@@ -31,112 +34,53 @@ def buscar_filmes(request):
 
 
 # =====================================================
-# HOME VIEW - MANTENDO OS FILMES ORIGINAIS DO CARROSSEL
+# HOME VIEW 100% DINÂMICA (Conectada ao Banco)
 # =====================================================
 
 def home_view(request):
-    """View da página inicial com filmes REALMENTE em cartaz em outubro 2025"""
+    """View Dinâmica que puxa do Banco de Dados"""
     
-    # Filmes EM CARTAZ REALMENTE (Outubro 2025) - MANTIDOS OS ORIGINAIS!
-    # NOTA: Estes são dados estáticos para o carrossel, não vêm do banco
-    filmes_cartaz = [
-        {
-            'id': 1,  # ID fictício para o link funcionar (vamos usar um filme real do banco)
-            'titulo': 'Tron: Ares',
-            'sinopse': 'Ares, um sofisticado programa de IA, é enviado do mundo digital para o mundo real em uma missão perigosa, marcando o primeiro encontro da humanidade com seres de Inteligência Artificial.',
-            'genero': 'Ficção Científica',
-            'ano': 2025,
-            'duracao': '119 min',
-            'nota': 6.7,
-            'poster': 'https://www.themoviedb.org/t/p/w600_and_h900_bestv2/3Aijwt71AG3dtI5WoYG8g9dWfQI.jpg',
-            'backdrop': 'https://image.tmdb.org/t/p/original/jUplF2dluebAYdHa901mhPVOZYU.jpg',
-            'trailer_url': 'https://www.youtube.com/embed/_68tQpaTaIs',
-        },
-        {
-            'id': 2,
-            'titulo': 'Coração de Lutador',
-            'sinopse': 'A história real de Mark Kerr, bicampeão dos pesos pesados do UFC, que enfrentou batalhas pessoais intensas fora do octógono, incluindo o vício em opioides.',
-            'genero': 'Drama',
-            'ano': 2025,
-            'duracao': '123 min',
-            'nota': 6.8,
-            'poster': 'https://www.themoviedb.org/t/p/w600_and_h900_bestv2/270Y5jWtJMU8cK2Q8MSwJqsnUgS.jpg',
-            'backdrop': 'https://image.tmdb.org/t/p/original/vfbryKoLrisx8Xh37OaTjTyrFY0.jpg',
-            'trailer_url': 'https://www.youtube.com/embed/HJuS4baeaxU',
-        },
-        {
-            'id': 3,
-            'titulo': 'Paddington no Peru',
-            'sinopse': 'Paddington e a família Brown embarcam em uma emocionante aventura na floresta amazônica do Peru em busca da lendária Cidade Perdida de Ouro.',
-            'genero': 'Aventura',
-            'ano': 2024,
-            'duracao': '106 min',
-            'nota': 7.3,
-            'poster': 'https://image.tmdb.org/t/p/w500/arMd4W3rqkzYfwdCgZp72BF3Tof.jpg',
-            'backdrop': 'https://image.tmdb.org/t/p/original/xi1VSt3DtkevUmzCx2mNlCoDe74.jpg',
-            'trailer_url': 'https://www.youtube.com/embed/1o4rjI-z1vs',
-        },
-        {
-            'id': 4,
-            'titulo': 'Nosferatu',
-            'sinopse': 'Uma jovem assombrada é atraída por um vampiro misterioso obcecado por ela, causando horror indescritível em seu caminho.',
-            'genero': 'Terror',
-            'ano': 2024,
-            'duracao': '132 min',
-            'nota': 7.3,
-            'poster': 'https://image.tmdb.org/t/p/w500/qD45xHA35HdJDGOaA1AgDwiWEgO.jpg',
-            'backdrop': 'https://image.tmdb.org/t/p/original/18TSJF1WLA4CkymvVUcKDBwUJ9F.jpg',
-            'trailer_url': 'https://www.youtube.com/embed/moIrYMjS0nI',
-        },
-    ]
+    # 1. Tenta pegar os filmes 'famosos' que você gosta para o banner
+    titulos_destaque = ['Tron: Ares', 'Coração de Lutador', 'Paddington no Peru', 'Nosferatu']
+    filmes_destaque = Filme.objects.filter(titulo__in=titulos_destaque)
     
-    # Top 10 Semanal - COM IDs CORRETOS DO BANCO
-    top10_semanal = [
-        {'id': 1, 'titulo': 'Interestelar', 'ano': 2014, 'nota': 8.7, 'poster': 'https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg', 'posicao': 1},
-        {'id': 3, 'titulo': 'A Origem', 'ano': 2010, 'nota': 8.8, 'poster': 'https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg', 'posicao': 2},
-        {'id': 2, 'titulo': 'O Poderoso Chefão', 'ano': 1972, 'nota': 9.2, 'poster': 'https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg', 'posicao': 3},
-        {'id': 7, 'titulo': 'Pulp Fiction', 'ano': 1994, 'nota': 8.9, 'poster': 'https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg', 'posicao': 4},
-        {'id': 6, 'titulo': 'Matrix', 'ano': 1999, 'nota': 8.7, 'poster': 'https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg', 'posicao': 5},
-        {'id': 10, 'titulo': 'Clube da Luta', 'ano': 1999, 'nota': 8.8, 'poster': 'https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg', 'posicao': 6},
-        {'id': 11, 'titulo': 'Forrest Gump', 'ano': 1994, 'nota': 8.8, 'poster': 'https://image.tmdb.org/t/p/w500/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg', 'posicao': 7},
-        {'id': 12, 'titulo': 'O Senhor dos Anéis', 'ano': 2003, 'nota': 8.9, 'poster': 'https://image.tmdb.org/t/p/w500/6oom5QYQ2yQTMJIbnvbkBL9cHo6.jpg', 'posicao': 8},
-        {'id': 8, 'titulo': 'Coringa', 'ano': 2019, 'nota': 8.4, 'poster': 'https://image.tmdb.org/t/p/w500/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg', 'posicao': 9},
-        {'id': 9, 'titulo': 'Duna', 'ano': 2021, 'nota': 8.0, 'poster': 'https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg', 'posicao': 10},
-    ]
+    # Se não achar (banco novo), pega os 4 últimos adicionados
+    if not filmes_destaque.exists():
+        filmes_destaque = Filme.objects.all().order_by('-id')[:4]
+
+    # 2. Monta os dados para o Carrossel
+    dados_cartaz = []
+    for filme in filmes_destaque:
+        dados_cartaz.append({
+            'id': filme.id,
+            'titulo': filme.titulo,
+            'sinopse': filme.sinopse[:150] + '...' if filme.sinopse else '',
+            'backdrop': filme.backdrop if filme.backdrop else filme.poster,
+            'poster': filme.poster,
+            'ano': filme.ano,
+            'duracao': filme.duracao,
+            'genero': filme.genero,
+            'nota': float(filme.nota) if filme.nota else 0,
+            'trailer_url': filme.trailer if filme.trailer else '',
+        })
     
-    # Indicações - COM IDs CORRETOS DO BANCO
-    indicacoes = [
-        {'id': 13, 'titulo': 'Cidade de Deus', 'ano': 2002, 'genero': 'Drama', 'nota': 8.6, 'poster': 'https://upload.wikimedia.org/wikipedia/pt/1/10/CidadedeDeus.jpg'},
-        {'id': 14, 'titulo': 'Toy Story', 'ano': 1995, 'genero': 'Animação', 'nota': 8.3, 'poster': 'https://image.tmdb.org/t/p/w500/uXDfjJbdP4ijW5hWSBrPrlKpxab.jpg'},
-        {'id': 22, 'titulo': 'Gladiador', 'ano': 2000, 'genero': 'Ação', 'nota': 8.5, 'poster': 'https://image.tmdb.org/t/p/w500/ty8TGRuvJLPUmAR1H1nRIsgwvim.jpg'},
-        {'id': 16, 'titulo': 'De Volta para o Futuro', 'ano': 1985, 'genero': 'Aventura', 'nota': 8.5, 'poster': 'https://image.tmdb.org/t/p/w500/fNOH9f1aA7XRTzl1sAOx9iF553Q.jpg'},
-        {'id': 15, 'titulo': 'O Iluminado', 'ano': 1980, 'genero': 'Terror', 'nota': 8.4, 'poster': 'https://image.tmdb.org/t/p/w500/xazWoLealQwEgqZ89MLZklLZD3k.jpg'},
-        {'id': 27, 'titulo': 'La La Land', 'ano': 2016, 'genero': 'Romance', 'nota': 8.0, 'poster': 'https://image.tmdb.org/t/p/w500/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg'},
-    ]
-    
-    # Em Alta - COM IDs CORRETOS DO BANCO
-    em_alta = [
-        {'id': 5, 'titulo': 'Vingadores: Ultimato', 'ano': 2019, 'genero': 'Ação', 'nota': 8.4, 'poster': 'https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg'},
-        {'id': 20, 'titulo': 'Se Beber, Não Case!', 'ano': 2009, 'genero': 'Comédia', 'nota': 7.7, 'poster': 'https://m.media-amazon.com/images/I/618FiO7H+sS._AC_SY741_.jpg'},
-        {'id': 4, 'titulo': 'Parasita', 'ano': 2019, 'genero': 'Drama', 'nota': 8.5, 'poster': 'https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg'},
-        {'id': 17, 'titulo': 'Pantera Negra', 'ano': 2018, 'genero': 'Ação', 'nota': 7.3, 'poster': 'https://image.tmdb.org/t/p/w500/uxzzxijgPIY7slzFvMotPv8wjKA.jpg'},
-        {'id': 23, 'titulo': 'Wall-E', 'ano': 2008, 'genero': 'Animação', 'nota': 8.1, 'poster': 'https://image.tmdb.org/t/p/w500/hbhFnRzzg6ZDmm8YAmxBnQpQIPh.jpg'},
-        {'id': 24, 'titulo': 'Divertida Mente', 'ano': 2015, 'genero': 'Animação', 'nota': 8.1, 'poster': 'https://image.tmdb.org/t/p/w500/lRHE0vzf3oYJrhbsHXjIkF4Tl5A.jpg'},
-    ]
-    
-    # Se usuário estiver logado, verifica quais filmes já estão na estante
+    # 3. Outras Listas
+    top10 = Filme.objects.order_by('-nota')[:10]
+    em_alta = Filme.objects.order_by('?')[:6]
+    indicacoes = Filme.objects.order_by('?')[:6]
+
+    # 4. Estante do Usuário
     filmes_na_estante = []
     if request.user.is_authenticated:
         filmes_na_estante = list(Estante.objects.filter(usuario=request.user).values_list('filme_id', flat=True))
-    
+
     context = {
-        'filmes_cartaz': json.dumps(filmes_cartaz),
-        'top10_semanal': top10_semanal,
+        'filmes_cartaz': json.dumps(dados_cartaz),
+        'top10_semanal': top10,
         'indicacoes': indicacoes,
         'em_alta': em_alta,
         'filmes_na_estante': filmes_na_estante,
     }
-    
     return render(request, 'home.html', context)
 
 
@@ -228,20 +172,23 @@ def remover_filme_estante(request, filme_id):
 @login_required
 @require_POST
 def adicionar_comentario(request, filme_id):
-    """Adiciona comentário ao filme"""
+    """Adiciona comentário ao filme (COM SUPORTE A SPOILER)"""
     
     filme = get_object_or_404(Filme, id=filme_id)
     texto = request.POST.get('texto', '').strip()
+    # Verifica se o checkbox 'spoiler' foi marcado no HTML
+    tem_spoiler = request.POST.get('spoiler') == 'on'
     
     if not texto:
         messages.error(request, 'O comentário não pode estar vazio!')
         return redirect('filmes:filme_detalhes', filme_id=filme_id)
     
-    # Cria o comentário
+    # Cria o comentário salvando o status do spoiler
     comentario = Comentario.objects.create(
         filme=filme,
         usuario=request.user,
-        texto=texto
+        texto=texto,
+        spoiler=tem_spoiler
     )
     
     messages.success(request, 'Comentário adicionado com sucesso!')
@@ -256,6 +203,7 @@ def adicionar_comentario(request, filme_id):
                 'usuario': comentario.usuario.username,
                 'foto_perfil': comentario.usuario.perfil.get_foto_url() if hasattr(comentario.usuario, 'perfil') else '',
                 'data': comentario.data_criacao.strftime('%d/%m/%Y %H:%M'),
+                'spoiler': tem_spoiler
             }
         })
     
@@ -324,3 +272,93 @@ def deletar_comentario(request, comentario_id):
         return JsonResponse({'success': True})
     
     return redirect('filmes:filme_detalhes', filme_id=filme_id)
+
+
+# =====================================================
+# COMUNIDADES E FÓRUM
+# =====================================================
+
+def lista_comunidades(request):
+    comunidades = Comunidade.objects.all()
+    return render(request, 'filmes/comunidades.html', {'comunidades': comunidades})
+
+def detalhe_comunidade(request, slug):
+    comunidade = get_object_or_404(Comunidade, slug=slug)
+    topicos = comunidade.topicos.all().order_by('-data_criacao')
+    return render(request, 'filmes/comunidade_detalhe.html', {'comunidade': comunidade, 'topicos': topicos})
+
+@login_required
+def criar_topico(request, slug):
+    comunidade = get_object_or_404(Comunidade, slug=slug)
+    if request.method == 'POST':
+        form = TopicoForm(request.POST)
+        if form.is_valid():
+            topico = form.save(commit=False)
+            topico.comunidade = comunidade
+            topico.usuario = request.user
+            topico.save()
+            return redirect('filmes:detalhe_comunidade', slug=slug)
+    else:
+        form = TopicoForm()
+    return render(request, 'filmes/criar_topico.html', {'comunidade': comunidade, 'form': form})
+
+def detalhe_topico(request, topico_id):
+    topico = get_object_or_404(Topico, id=topico_id)
+    respostas = topico.respostas.all()
+    
+    if request.method == 'POST' and request.user.is_authenticated:
+        form = RespostaTopicoForm(request.POST)
+        if form.is_valid():
+            resposta = form.save(commit=False)
+            resposta.topico = topico
+            resposta.usuario = request.user
+            resposta.save()
+            return redirect('filmes:detalhe_topico', topico_id=topico.id)
+    else:
+        form = RespostaTopicoForm()
+        
+    return render(request, 'filmes/topico_detalhe.html', {'topico': topico, 'respostas': respostas, 'form': form})
+
+
+# =====================================================
+# NOTIFICAÇÕES E SUGESTÕES (NOVO)
+# =====================================================
+
+@login_required
+def enviar_sugestao(request, filme_id):
+    filme = get_object_or_404(Filme, id=filme_id)
+    
+    if request.method == 'POST':
+        username_dest = request.POST.get('username')
+        mensagem = request.POST.get('mensagem')
+        
+        try:
+            destinatario = User.objects.get(username=username_dest)
+            if destinatario == request.user:
+                messages.warning(request, 'Você não pode recomendar filmes para si mesmo!')
+            else:
+                Notificacao.objects.create(
+                    remetente=request.user,
+                    destinatario=destinatario,
+                    filme=filme,
+                    mensagem=mensagem
+                )
+                messages.success(request, f'Recomendação enviada para {destinatario.username}!')
+        except User.DoesNotExist:
+            messages.error(request, f'Usuário "{username_dest}" não encontrado.')
+            
+    return redirect('filmes:filme_detalhes', filme_id=filme.id)
+
+@login_required
+def ver_notificacoes(request):
+    notificacoes = Notificacao.objects.filter(destinatario=request.user).order_by('-data_envio')
+    nao_lidas = notificacoes.filter(lida=False).count()
+    return render(request, 'filmes/notificacoes.html', {'notificacoes': notificacoes, 'nao_lidas': nao_lidas})
+
+@login_required
+def marcar_como_lida(request, notificacao_id):
+    notificacao = get_object_or_404(Notificacao, id=notificacao_id)
+    if notificacao.destinatario == request.user:
+        notificacao.lida = True
+        notificacao.save()
+    return redirect('filmes:ver_notificacoes')
