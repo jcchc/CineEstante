@@ -6,51 +6,10 @@ from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-import os
-from dotenv import load_dotenv
 
 load_dotenv(BASE_DIR / '.env')
-
-TARGET_ENV = os.getenv('TARGET_ENV')
-NOT_PROD = not TARGET_ENV.lower().startswith('prod')
-
-if NOT_PROD:
-    DEBUG = True
-    SECRET_KEY = 'SUA_SECRET_KEY_AQUI'
-    ALLOWED_HOSTS = []
-
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-else:
-    SECRET_KEY = os.getenv('SECRET_KEY')
-    DEBUG = os.getenv('DEBUG', '0').lower() in ['true', 't', '1']
-
-    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
-    CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS').split(' ')
-
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('DBNAME'),
-            'HOST': os.environ.get('DBHOST'),
-            'USER': os.environ.get('DBUSER'),
-            'PASSWORD': os.environ.get('DBPASS'),
-            'OPTIONS': {'sslmode': 'require'},
-        }
-    }
-
-
-load_dotenv(BASE_DIR / '.env')
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 TARGET_ENV = os.getenv('TARGET_ENV', 'dev')
-
 NOT_PROD = not TARGET_ENV.lower().startswith('prod')
 
 # Sempre pegar do .env (NUNCA deixar fixo no código)
@@ -75,14 +34,11 @@ else:
     if SECURE_SSL_REDIRECT:
         SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+    # Configuração do banco para Azure (SQLite)
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('DBNAME'),
-            'HOST': os.environ.get('DBHOST'),
-            'USER': os.environ.get('DBUSER'),
-            'PASSWORD': os.environ.get('DBPASS'),
-            'OPTIONS': {'sslmode': 'require'},
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join('/home/site/wwwroot', 'db.sqlite3'),
         }
     }
 
