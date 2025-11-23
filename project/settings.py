@@ -9,9 +9,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / '.env')
 
-TARGET_ENV = os.getenv('TARGET_ENV', 'dev')
-NOT_PROD = not TARGET_ENV.lower().startswith('prod')
-
 # Sempre pegar do .env (NUNCA deixar fixo no código)
 SECRET_KEY = os.getenv('SECRET_KEY')
 
@@ -25,13 +22,14 @@ ALLOWED_HOSTS = [
     '127.0.0.1'
 ]
 
-# CSRF para produção
-if not NOT_PROD:
-    CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
-    SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', '0').lower() in ['true', 't', '1']
+# CSRF e Proxy SSL (ESSENCIAL NO AZURE)
+CSRF_TRUSTED_ORIGINS = [
+    'https://cineestante-novo-bqecc6drbrcwe5aj.brazilsouth-01.azurewebsites.net'
+]
 
-    if SECURE_SSL_REDIRECT:
-        SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True  # ADICIONADO - Força HTTPS no Azure
 
 # Configuração do banco de dados - SQLite para dev e prod
 DATABASES = {
@@ -123,7 +121,8 @@ USE_TZ = True
 STATIC_URL = os.environ.get('DJANGO_STATIC_URL', '/static/')
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-STATICFILES_STORAGE = ('whitenoise.storage.CompressedManifestStaticFilesStorage')
+# CORRIGIDO - Removido parênteses desnecessários
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
 MEDIA_URL = '/media/'
@@ -135,7 +134,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Auth
-AUTH_USER_MODEL = 'auth.User'
 LOGIN_URL = '/usuarios/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
