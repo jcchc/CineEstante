@@ -12,8 +12,8 @@ load_dotenv(BASE_DIR / '.env')
 # Sempre pegar do .env (NUNCA deixar fixo no código)
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-# LÓGICA CORRIGIDA - Sempre lê do ambiente
-DEBUG = os.getenv('DEBUG', '0').lower() in ['true', 't', '1']
+# 🔧 AJUSTE 1: DEBUG fixo em False para produção
+DEBUG = False
 
 # ALLOWED_HOSTS configurado para Azure + localhost
 ALLOWED_HOSTS = [
@@ -27,9 +27,10 @@ CSRF_TRUSTED_ORIGINS = [
     'https://cineestante-novo-bqecc6drbrcwe5aj.brazilsouth-01.azurewebsites.net'
 ]
 
-USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = True  # ADICIONADO - Força HTTPS no Azure
+# 🔧 AJUSTE 2: Removidas as 3 linhas que causavam Application Error
+# USE_X_FORWARDED_HOST = True (REMOVIDO)
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') (REMOVIDO)
+# SECURE_SSL_REDIRECT = True (REMOVIDO)
 
 # Configuração do banco de dados - SQLite para dev e prod
 DATABASES = {
@@ -118,10 +119,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = os.environ.get('DJANGO_STATIC_URL', '/static/')
+# 🔧 AJUSTE 3: STATIC_URL fixo (sem variável de ambiente)
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# CORRIGIDO - Removido parênteses desnecessários
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
