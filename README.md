@@ -117,5 +117,8 @@ Como usuário, quero visualizar trailers dos filmesem cartaz no carrosel ao deix
 Devido à incompatibilidade de horários entre os membros e ao foco no desenvolvimento inicial das funcionalidades, **não foi possível aplicar programação em par nesta sprint**.  
 Planeja-se adotar a prática a partir da **Sprint 04**.  
 
+## 🚀 Entrega 03 
+
+
 
 
