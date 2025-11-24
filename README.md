@@ -155,7 +155,8 @@ O objetivo destes screencasts é:
 
 ## Pair Progamming
 
-NÃO FOI UTILIZADO PARA A DIVISÃO DE TAREFAS.
+Relatório
+Atualizamos o documento de pair programming para registrar a divisão e a realização das tarefas desta entrega. Para acessá-lo :https://docs.google.com/document/d/1MZ0je74ZawWbyDh90Bi_xL3PDMmHKKmG2duzz5g-t7k/edit?usp=sharing
 
 ## 🐞 Bug Tracker
 
