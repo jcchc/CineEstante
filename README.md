@@ -117,7 +117,43 @@ Como usuário, quero visualizar trailers dos filmesem cartaz no carrosel ao deix
 Devido à incompatibilidade de horários entre os membros e ao foco no desenvolvimento inicial das funcionalidades, **não foi possível aplicar programação em par nesta sprint**.  
 Planeja-se adotar a prática a partir da **Sprint 04**.  
 
-## 🚀 Entrega 03 
+## 🚀 Entrega 04
+
+Link do AZURE: https://cineestante-novo-bqecc6drbrcwe5aj.brazilsouth-01.azurewebsites.net/
+## 🎬 Screencasts
+
+### 1. Funcionalidades implementadas
+Realizamos um screencast mostrando o sistema em funcionamento com as novas funcionalidades implementadas.  
+Para acessá-lo, [clique aqui](https://youtu.be/mffn4K5GKxs) 
+
+---
+
+### 2. Teste End-To-End
+Realizamos um teste End-To-End com as modificações para testar as histórias criadas nessa entrega e mostrar o fluxo da aplicação.  
+Para acessá-lo, [clique aqui](https://youtu.be/Jsk7NFUkV8A).
+
+---
+
+### 3. Build e Deploy automático (CI/CD)
+Gravamos também um vídeo mostrando o processo de build e deploy automático com o CI/CD modificado para essa entrega.  
+Para acessá-lo, [clique aqui](https://youtu.be/i5iKxzuBnCs).
+
+---
+
+## 🚀 Objetivo
+O objetivo destes screencasts é:
+- Demonstrar as funcionalidades entregues.
+- Validar o fluxo da aplicação por meio de testes End-to-End.
+- Exibir o processo automatizado de build e deploy com CI/CD.
+
+---
+
+## 📂 Estrutura
+- **Funcionalidades** → Demonstração prática das histórias implementadas.  
+- **Teste E2E** → Garantia de qualidade e funcionamento integrado.  
+- **CI/CD** → Pipeline automatizado de build e deploy.
+
+
 
 
 
