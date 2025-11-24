@@ -153,8 +153,24 @@ O objetivo destes screencasts é:
 - **Teste E2E** → Garantia de qualidade e funcionamento integrado.  
 - **CI/CD** → Pipeline automatizado de build e deploy.
 
+## Pair Progamming
 
+NÃO FOI UTILIZADO PARA A DIVISÃO DE TAREFAS.
 
+## 🐞 Bug Tracker
+
+Estamos utilizando o [GitHub Issues](https://github.com/joctb/CineStante/issues) como sistema de rastreamento de bugs e tarefas do projeto.
+
+As issues estão organizadas com labels para facilitar a triagem e acompanhamento das entregas, como:
+- `bug`: erros identificados no sistema
+- `feature`: novas funcionalidades
+- `enhancement`: melhorias visuais ou funcionais
+- `urgent`: prioridade alta
+- `help wanted`: tarefas abertas para colaboração
+
+Abaixo, um exemplo da visualização atual das issues abertas:
+
+![Bug Tracker - GitHub Issues](https://github.com/joctb/CineStante/assets/your-image-id-here)
 
 
 
