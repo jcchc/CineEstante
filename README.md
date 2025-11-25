@@ -179,6 +179,8 @@ Abaixo, um exemplo da visualização atual das issues ja resolvidas:
 JIRA (Sprint 04):
 <img width="1600" height="721" alt="image" src="https://github.com/user-attachments/assets/fdc66cd0-b13b-45d4-9e40-a794cc95d295" />
 <img width="1551" height="260" alt="image" src="https://github.com/user-attachments/assets/d602c2d6-a6a9-4fc4-ba42-c12a95dcadce" />
+<img width="1600" height="709" alt="image" src="https://github.com/user-attachments/assets/7591d1e2-34e2-42fe-ad4a-3e609a8053cf" />
+
 
 
 
