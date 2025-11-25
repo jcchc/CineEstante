@@ -171,7 +171,8 @@ As issues estão organizadas com labels para facilitar a triagem e acompanhament
 
 Abaixo, um exemplo da visualização atual das issues abertas:
 
-<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/fe9690ff-03c7-45dd-aa21-a70ee58a5634" />
+<img width="1600" height="708" alt="image" src="https://github.com/user-attachments/assets/7cbacb27-d1a1-491e-9ad0-bd5cf8c5cb85" />
+
 
 
 
