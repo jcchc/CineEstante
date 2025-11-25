@@ -169,7 +169,7 @@ As issues estão organizadas com labels para facilitar a triagem e acompanhament
 - `urgent`: prioridade alta
 - `help wanted`: tarefas abertas para colaboração
 
-Abaixo, um exemplo da visualização atual das issues abertas:
+Abaixo, um exemplo da visualização atual das issues ja resolvidas:
 
 <img width="1600" height="708" alt="image" src="https://github.com/user-attachments/assets/7cbacb27-d1a1-491e-9ad0-bd5cf8c5cb85" />
 
