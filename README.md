@@ -174,6 +174,14 @@ Abaixo, um exemplo da visualização atual das issues ja resolvidas:
 <img width="1600" height="708" alt="image" src="https://github.com/user-attachments/assets/7cbacb27-d1a1-491e-9ad0-bd5cf8c5cb85" />
 
 
+## 📋 JIRA
+
+JIRA (Sprint 04):
+<img width="1600" height="721" alt="image" src="https://github.com/user-attachments/assets/fdc66cd0-b13b-45d4-9e40-a794cc95d295" />
+<img width="1600" height="709" alt="image" src="https://github.com/user-attachments/assets/07452883-119c-4f4a-a490-b01130e6cfd1" />
+
+
+
 
 
 
